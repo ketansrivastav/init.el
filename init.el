@@ -43,6 +43,10 @@
    git-gutter
    use-package
    flycheck
+   try
+   which-key
+   ace-window
+  evil
    monokai-theme 
    ))
 
@@ -54,20 +58,9 @@
 ;;company
 ; from https://github.com/purcell/emacs.d/blob/master/lisp/init-company.el
 
-(require 'company)
-(setq tab-always-indent 'complete)
-(add-to-list 'completion-styles 'initials t)
 
-(dolist (backend '(company-eclim company-semantic))
-  (delq backend company-backends))
-
-(define-key company-mode-map (kbd "M-/") 'company-complete)
-(define-key company-active-map (kbd "M-/") 'company-other-backend)
-(define-key company-active-map (kbd "C-n") 'company-select-next)
-(define-key company-active-map (kbd "C-p") 'company-select-previous)
-(setq-default company-daxbbrev-other-buffers 'all
-              company-tooltip-align-annotations t)
-(global-set-key (kbd "M-C-/") 'company-complete)
+(company-mode t)
+(add-hook 'after-init-hook 'global-company-mode)
 
 ;; UI
 (load-theme 'monokai t)
@@ -115,6 +108,10 @@
 
 
 ;; misc
+;; Enable Evil
+(require 'evil)
+(evil-mode 1)
+
 ;; Changes all yes/no questions to y/n type
 (fset 'yes-or-no-p 'y-or-n-p)
 (add-to-list 'auto-mode-alist '("\\.zsh$" . shell-script-mode))
@@ -128,7 +125,53 @@
 ;; Go straight to scratch buffer on startup
 (setq inhibit-startup-message t)
 (global-set-key (kbd "C-x g") 'magit-status)
+(use-package which-key
+  :ensure t
+  :config
+  (which-key-mode))
 
+
+;;(setq ido-enable-flex-matching t)
+;;(setq ido-everywhere t)
+;;(ido-mode 1)
+(use-package counsel
+:ensure t
+)
+
+(use-package swiper
+:ensure try
+:config
+(progn
+(ivy-mode 1)
+(setq ivy-use-virtual-buffers t)
+(global-set-key "\C-s" 'swiper)
+(global-set-key (kbd "C-c C-r") 'ivy-resume)
+(global-set-key (kbd "<f6>") 'ivy-resume)
+(global-set-key (kbd "M-x") 'counsel-M-x)
+(global-set-key (kbd "C-x C-f") 'counsel-find-file)
+(global-set-key (kbd "<f1> f") 'counsel-describe-function)
+(global-set-key (kbd "<f1> v") 'counsel-describe-variable)
+(global-set-key (kbd "<f1> l") 'counsel-load-library)
+(global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
+(global-set-key (kbd "<f2> u") 'counsel-unicode-char)
+(global-set-key (kbd "C-c g") 'counsel-git)
+(global-set-key (kbd "C-c j") 'counsel-git-grep)
+(global-set-key (kbd "C-c k") 'counsel-ag)
+(global-set-key (kbd "C-x l") 'counsel-locate)
+(global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
+(define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+))
+
+
+(use-package ace-window
+:ensure t
+:init
+(progn
+(global-set-key [remap other-window] 'ace-window)
+(custom-set-faces
+'(aw-leading-char-face
+((t (:inherit ace-jump-face-foreground :height 3.0)))))
+))
 ;;==================================================
 
   ;; clojure
@@ -143,6 +186,7 @@
             (put-clojure-indent 'reg-event-fx 1)
             (put-clojure-indent 'reg-fx 1)
             (put-clojure-indent 'reg-cofx 1)
+
             (put-clojure-indent 'reg-sub 1)
             (put-clojure-indent 'bind-relations 1)
             (put-clojure-indent 'react-method 1)
