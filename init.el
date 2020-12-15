@@ -47,6 +47,9 @@
    which-key
    ace-window
   evil
+  docker-compose-mode
+   dockerfile-mode
+
    monokai-theme 
    ))
 
