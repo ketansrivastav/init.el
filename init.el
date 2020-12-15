@@ -161,6 +161,7 @@
 
 ;; UI
 (menu-bar-mode -1)
+(tool-bar-mode -1)
 (global-linum-mode)
 (scroll-bar-mode -1)
 (setq-default frame-title-format "%b (%f)")
