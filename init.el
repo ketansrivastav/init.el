@@ -1,12 +1,17 @@
 (require 'package)
 
  
+
+(add-to-list 'package-archives
+             '("tromey" . "http://tromey.com/elpa/") t)
+(add-to-list 'package-archives
+             '("org" . "http://orgmode.org/elpa/") t)
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.org/packages/") t)
 (add-to-list 'package-archives
              '("melpa-stable" . "http://stable.melpa.org/packages/") t)
- (package-refresh-contents)
+
 (package-initialize)
-
-
 (setq package-enable-at-startup nil)
 
 (set-face-attribute 'default nil :family "Fira Mono Medium")
@@ -27,12 +32,7 @@
 
 (global-undo-tree-mode)
 
-;; evil
 
-(unless (package-installed-p 'evil)
-  (package-install 'evil))
-(require 'evil)
-(evil-mode 1)
 ;; ivy
 
 (unless (package-installed-p 'ivy)
@@ -57,6 +57,9 @@
 
 (unless (package-installed-p 'projectile)
   (package-install 'projectile))
+;;use package
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
 
 (require 'projectile)
 (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
@@ -72,13 +75,25 @@
 (global-set-key (kbd "C-x g") 'magit-status)
 (global-set-key (kbd "C-x M-g") 'magit-dispatch)
 
+;; swiper
+(unless (package-installed-p 'swiper)
+  (package-install 'swiper))
+(use-package swiper
+:ensure try
+:config
+(progn
+(global-set-key "\C-s" 'swiper)))
+
 
 ;; flycheck
 
 (unless (package-installed-p 'flycheck)
   (package-install 'flycheck))
 
-(global-flycheck-mode)
+;; rainbow-delimiters
+(unless (package-installed-p 'rainbow-delimiters)
+  (package-install 'rainbow-delimiters))
+
 
 ;; company-mode
 
@@ -90,7 +105,32 @@
 (global-set-key (kbd "M-TAB") #'company-complete)
 (global-set-key (kbd "TAB") #'company-indent-or-complete-common)
 
+;; ace-mode
+
+(unless (package-installed-p 'ace-window)
+  (package-install 'ace-window))
+(use-package ace-window
+:ensure t
+:init
+(progn
+(global-set-key [remap other-window] 'ace-window)
+(custom-set-faces
+'(aw-leading-char-face
+((t (:inherit ace-jump-face-foreground :height 3.0)))))
+))
+
+(unless (package-installed-p 'smartparens)
+  (package-install 'smartparens))
+
+(use-package smartparens-config
+  :ensure smartparens
+  :config (progn (show-smartparens-global-mode t)))
+
+;;(add-hook 'prog-mode-hook 'turn-on-smartparens-strict-mode)
+;;(add-hook 'markdown-mode-hook 'turn-on-smartparens-strict-mode)
+
 ;; clojure-mode
+
 
 (unless (package-installed-p 'clojure-mode)
   (package-install 'clojure-mode)
@@ -99,21 +139,22 @@
 (require 'clojure-mode-extra-font-locking)
 
 (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
-(add-hook 'clojure-mode-hook #'subword-mode)
+;;(add-hook 'clojure-mode-hook #'subword-mode)
 (add-hook 'clojure-mode-hook #'smartparens-strict-mode)
-(add-hook 'clojure-mode-hook #'aggressive-indent-mode)
+;;(add-hook 'clojure-mode-hook #'aggressive-indent-mode)
+(add-to-list 'auto-mode-alist '("\\.clj\\'" . clojure-mode))
 
 ;; cider
 
 (unless (package-installed-p 'cider)
   (package-install 'cider))
 
-(add-hook 'cider-repl-mode-hook #'subword-mode)
-(add-hook 'cider-repl-mode-hook #'smartparens-strict-mode)
+;;(add-hook 'cider-repl-mode-hook #'subword-mode)
+;;(add-hook 'cider-repl-mode-hook #'smartparens-strict-mode)
 (add-hook 'cider-repl-mode-hook #'rainbow-delimiters-mode)
-(add-hook 'cider-repl-mode-hook #'aggressive-indent-mode)
-(add-hook 'cider-repl-mode-hook #'company-mode)
-(add-hook 'cider-mode-hook #'company-mode)
+;;(add-hook 'cider-repl-mode-hook #'aggressive-indent-mode)
+;;(add-hook 'cider-repl-mode-hook #'company-mode)
+;;(add-hook 'cider-mode-hook #'company-mode)
 
 (setq cider-repl-wrap-history t)
 (setq cider-repl-history-file "~/.emacs.d/cider-history")
@@ -147,45 +188,123 @@
 
 (which-key-mode)
 
+
+(unless (package-installed-p 'smart-mode-line)
+  (package-install 'smart-mode-line))
+
+
+
+
 ;; editing
 
 (show-paren-mode 1)
 (global-hl-line-mode 1)
 
-(global-set-key (kbd "C-s") 'isearch-forward-regexp)
-(global-set-key (kbd "C-r") 'isearch-backward-regexp)
-(global-set-key (kbd "C-M-s") 'isearch-forward)
-(global-set-key (kbd "C-M-r") 'isearch-backward)
+;;(global-set-key (kbd "C-s") 'isearch-forward-regexp)
+;;(global-set-key (kbd "C-r") 'isearch-backward-regexp)
+;;(global-set-key (kbd "C-M-s") 'isearch-forward)
+;;(global-set-key (kbd "C-M-r") 'isearch-backward)
 
-(setq-default indent-tabs-mode nil)
 
-;; UI
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-(global-linum-mode)
-(scroll-bar-mode -1)
-(setq-default frame-title-format "%b (%f)")
+;;(add-hook 'after-load-functions '(view-mode t))
+
+;(add-hook 'view-mode-hook (lambda() 
+;(setq sml/theme 'dark)
+;(sml/setup)
+
+					;))
+
+(setq linum-format "%5d │ ")
+
+(defun my-linum-mode-hook ()
+  (linum-mode t))
+
+(add-hook 'find-file-hook 'my-linum-mode-hook)
+
+
+;; key bindings for smartparens
+(defmacro def-pairs (pairs)
+  "Define functions for pairing. PAIRS is an alist of (NAME . STRING)
+conses, where NAME is the function name that will be created and
+STRING is a single-character string that marks the opening character.
+
+  (def-pairs ((paren . \"(\")
+              (bracket . \"[\"))
+
+defines the functions WRAP-WITH-PAREN and WRAP-WITH-BRACKET,
+respectively."
+  `(progn
+     ,@(loop for (key . val) in pairs
+             collect
+             `(defun ,(read (concat
+                             "wrap-with-"
+                             (prin1-to-string key)
+                             "s"))
+                  (&optional arg)
+                (interactive "p")
+                (sp-wrap-with-pair ,val)))))
+
+(def-pairs ((paren . "(")
+            (bracket . "[")
+            (brace . "{")
+            (single-quote . "'")
+            (double-quote . "\"")
+            (back-quote . "`")))
+
+(bind-keys
+ :map smartparens-mode-map
+ ("C-M-a" . sp-beginning-of-sexp)
+ ("C-M-e" . sp-end-of-sexp)
+
+ ("C-<down>" . sp-down-sexp)
+ ("C-<up>"   . sp-up-sexp)
+ ("M-<down>" . sp-backward-down-sexp)
+ ("M-<up>"   . sp-backward-up-sexp)
+
+ ("C-M-f" . sp-forward-sexp)
+ ("C-M-b" . sp-backward-sexp)
+
+ ("C-M-n" . sp-next-sexp)
+ ("C-M-p" . sp-previous-sexp)
+
+ ("C-S-f" . sp-forward-symbol)
+ ("C-S-b" . sp-backward-symbol)
+
+ ("C-<right>" . sp-forward-slurp-sexp)
+ ("M-<right>" . sp-forward-barf-sexp)
+ ("C-<left>"  . sp-backward-slurp-sexp)
+ ("M-<left>"  . sp-backward-barf-sexp)
+
+ ("C-M-t" . sp-transpose-sexp)
+ ("C-M-k" . sp-kill-sexp)
+ ("C-k"   . sp-kill-hybrid-sexp)
+ ("M-k"   . sp-backward-kill-sexp)
+ ("C-M-w" . sp-copy-sexp)
+ ("C-M-d" . delete-sexp)
+
+ ("M-<backspace>" . backward-kill-word)
+ ("C-<backspace>" . sp-backward-kill-word)
+ ([remap sp-backward-kill-word] . backward-kill-word)
+
+ ("M-[" . sp-backward-unwrap-sexp)
+ ("M-]" . sp-unwrap-sexp)
+
+ ("C-x C-t" . sp-transpose-hybrid-sexp)
+
+ ("C-c ("  . wrap-with-parens)
+ ("C-c ["  . wrap-with-brackets)
+ ("C-c {"  . wrap-with-braces)
+ ("C-c '"  . wrap-with-single-quotes)
+ ("C-c \"" . wrap-with-double-quotes)
+ ("C-c _"  . wrap-with-underscores)
+ ("C-c `"  . wrap-with-back-quotes))
+
 (setq ring-bell-function 'ignore)
-
-
-;; misc
-
 (fset 'yes-or-no-p 'y-or-n-p)
 (setq create-lockfiles nil)
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(column-number-mode t)
- '(ivy-mode t)
- '(package-selected-packages
-   (quote
-    (company company-mode undo-tree flycheck-clj-kondo clojure-mode-extra-font-locking clojure-mode flycheck magit projectile smex ivy aggressive-indent smartparens rainbow-delimiters zenburn-theme))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(define-key ctl-x-map "\C-z" 'view-mode)
+(setq sml/no-confirm-load-theme t)
+(setq sml/theme 'dark)
+(sml/setup)
