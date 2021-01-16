@@ -243,7 +243,7 @@ STRING is a single-character string that marks the opening character.
 defines the functions WRAP-WITH-PAREN and WRAP-WITH-BRACKET,
 respectively."
   `(progn
-     ,@(cl-loop for (key . val) in pairs
+     ,@(loop for (key . val) in pairs
              collect
              `(defun ,(read (concat
                              "wrap-with-"
@@ -308,9 +308,3 @@ respectively."
  ("C-c _"  . wrap-with-underscores)
  ("C-c `"  . wrap-with-back-quotes))
 
-(unless (package-installed-p 'evil)
-  (package-install 'evil))
-
-;; Enable Evil
-(require 'evil)
-(evil-mode 1)
